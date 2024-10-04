@@ -5,6 +5,49 @@
 
 <mapper namespace="com.example.demo.mapper.MainMapper">
     <select id="PickSelect" resultType="com.example.demo.dto.TestDTO">
-        select * from ingredients where id = 1;
+        select * from ingredients where id = 1
     </select>
+
+
+    <select id="getCategoryLevel1" resultType="com.example.demo.dto.CategoryDTO">
+        select * from category where id = 2
+    </select>
+
+    <select id="getCategoryLevel2" resultType="com.example.demo.dto.subCategoryDTO">
+
+    <!--    select * from category c
+        join categoryCondition cc
+        on c.id = cc.category_id
+        where c.level = 2 AND parent_id = 2-->
+
+        SELECT c.id, c.price, c.name , sub.name as sub_name, sub.id as sub_id, sub.price as sub_price,
+        parent.name as parent_name, parent.id as parent_id, parent.content as parent_content, parent.price as parent_price,
+        parent.name as parent_name, cc.is_required as is_required, cc.is_paid as is_paid,  cc.input_type as input_type
+        FROM category c
+        JOIN categoryCondition cc ON c.id = cc.category_id
+        LEFT JOIN category sub ON c.id = sub.parent_id
+        JOIN category parent ON parent.id = c.parent_id
+        WHERE c.level = 2 AND c.parent_id = 2
+
+
+
+    </select>
+
+    <insert id="testSumit" parameterType="com.example.demo.dto.CategoryDTO">
+        INSERT INTO category (name, parent_id, level, price, content) VALUES (#{name}, NULL, 1, #{price}, #{content})
+    </insert>
+
+    <insert id="testSumit2" parameterType="com.example.demo.dto.FormDTO">
+
+
+            INSERT INTO categoryHierarchy (main_category_id, sub_category_id, sub_sub_category_id, input_value)
+            VALUES
+            <foreach collection="list" item="item" separator=",">
+                (#{item.mainCategoryId}, #{item.subCategoryId}, #{item.subSubCategoryId}, #{item.inputValue})
+            </foreach>
+
+
+
+    </insert>
+
 </mapper>
