@@ -2,6 +2,8 @@ package com.example.demo.service;
 
 import com.example.demo.dto.*;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 public interface MainService {
@@ -10,4 +12,8 @@ public interface MainService {
   public List<subCategoryDTO> getCategoryLevel2();
   public void testSumit(CategoryDTO dto);
   public void testSumit2( List<FormDTO> dto);
+  public void insertFirstCategory(CategoryCondiDTO dto);
+  public void insertSecondCategory(CategoryCondiDTO dto);
+  public void insertLastCategory(CategoryCondiDTO dto);
+  public List<reservationslotsDTO> getDateTime(LocalDate date);
 }

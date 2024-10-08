@@ -40068,98 +40068,15 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-function Admin() {
-  const [priceType, setPriceType] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false); // 'free' or 'paid'
-  const [serviceName, setServiceName] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
-  const [serviceDetail, setServiceDetail] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(0);
-  const [fieldType, setFieldType] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
-    select1: false,
-    selectN: false,
-    text: false,
-    number: false
-  }); // 선택 필드 타입 상태
-  const [isRequired, setIsRequired] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(true); // true or false
-
-  const [isPaid, setIsPaid] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false); // 유료/무료 상태 관리
-  const [inputValue, setInputValue] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(''); // input 값 관리
-
-  // 대분류 정보
-  const [product, setProduct] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
-    name: '',
-    price: '',
-    content: ''
-  });
-  // 중분류  받아내기
-  // 중분류 상태 관리
-  const [product2, setProduct2] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
-    name: '',
-    price: 0,
-    isRequired: false,
-    isPaid: false,
-    inputType: 'text'
-  });
-
-  // 상태값들이 변경될 때 product2를 업데이트
+function Main() {
+  const [test, setTest] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)();
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    setProduct2({
-      name: serviceName,
-      price: serviceDetail,
-      isRequired: isRequired,
-      isPaid: priceType,
-      inputType: Object.keys(fieldType).find(key => fieldType[key]) || 'text'
-    });
-  }, [serviceName, serviceDetail, isRequired, priceType, fieldType]);
-  console.log(product2);
-  const [inputFields, setInputFields] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([{
-    name: null,
-    price: 0
-  }]);
-
-  // 값 가져오기
-  const [categoryLevel2, setCategoryLevel2] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([{
-    id: 0,
-    name: '',
-    price: 0,
-    subId: 0,
-    subName: '',
-    subPrice: '',
-    parentId: '',
-    parentName: '',
-    parentContent: '',
-    parentPrice: '',
-    isRequired: false,
-    isPaid: false,
-    inputType: ''
-  }]);
-  const submitOnClick = () => {
-    const requestData = [{
-      category: '대분류',
-      ...product
-    }, {
-      category: '중분류',
-      ...product2
-    }, ...inputFields.map(field => ({
-      ...field,
-      category: '소분류'
-    })) // 여기서 '소분류'를 추가
-    ];
-    console.log(requestData);
-    axios__WEBPACK_IMPORTED_MODULE_3__["default"].post('/home/testSumit3', requestData).then(response => {
-      console.log('Response:', response.data);
+    axios__WEBPACK_IMPORTED_MODULE_3__["default"].get('/home/getItem').then(response => {
+      setTest(response.data);
     }).catch(error => {
-      console.error('Error:', error);
+      console.error('Error fetching data:', error);
     });
-  };
-
-  // 유료/무료 변경 핸들러
-  const handleRadioChange = e => {
-    setIsPaid(e.target.value === true);
-  };
-
-  // input 값 변경 핸들러
-  const handleInputChange = e => {
-    setInputValue(e.target.value);
-  };
+  }, []);
   const [categoryLevel1, setCategoryLevel1] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
     id: 0,
     name: '',
@@ -40175,6 +40092,35 @@ function Admin() {
       console.log('Error Category', error);
     });
   }, []);
+  const [categoryLevel2, setCategoryLevel2] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([{
+    id: 0,
+    name: '',
+    price: 0,
+    subId: 0,
+    subName: '',
+    subPrice: '',
+    parentId: '',
+    parentName: '',
+    parentContent: '',
+    parentPrice: '',
+    isRequired: false,
+    isPaid: false,
+    inputType: ''
+  }]);
+
+  /*    const [categoryLevel2, setCategoryLevel2] = useState([{
+          id: 0,
+          name: '',
+          parentId: 0,
+          level: 0,
+          price: 0,
+          condiId: 0,
+          categoryId: 0,
+          isRequired: false,
+          isPaid: false,
+          inputType: ''
+      }]);
+  */
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     axios__WEBPACK_IMPORTED_MODULE_3__["default"].get('/home/getCategoryLevel2').then(response => {
       setCategoryLevel2(response.data);
@@ -40182,6 +40128,31 @@ function Admin() {
       console.log('Error Category', error);
     });
   }, []);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    // categoryLevel2가 undefined가 아닐 때
+    if (categoryLevel2.length > 0) {
+      console.log(categoryLevel2); // 리스트 전체 출력
+    }
+  }, [categoryLevel2]);
+  const groupedCategories = categoryLevel2.reduce((acc, item) => {
+    if (!acc[item.id]) {
+      acc[item.id] = {
+        ...item,
+        subItems: []
+      }; // 새로운 그룹 초기화
+    }
+    acc[item.id].subItems.push({
+      subId: item.subId,
+      subName: item.subName,
+      subPrice: item.subPrice
+    }); // 서브 아이템 추가
+    return acc;
+  }, {});
+  const [product, setProduct] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
+    name: '',
+    price: '',
+    content: ''
+  });
 
   // 입력 변경 처리 함수
   const handleChange = e => {
@@ -40200,27 +40171,81 @@ function Admin() {
     e.preventDefault();
     console.log(product); // 최종 객체 출력
   };
-
-  // 체크박스 변경 핸들러
-  // 필드 선택 시 다른 필드는 초기화하고 하나만 선택
-  const handleCheckboxChange = field => {
-    setFieldType({
-      select1: field === 'select1',
-      selectN: field === 'selectN',
-      text: field === 'text',
-      number: field === 'number'
+  const submitOnClick = () => {
+    axios__WEBPACK_IMPORTED_MODULE_3__["default"].post('/home/testSumit', product) // `/api/submit`는 서버의 엔드포인트
+    .then(response => {
+      console.log('Response:', response.data); // 성공 시 서버 응답 출력
+    }).catch(error => {
+      console.error('Error submitting data:', error); // 에러 발생 시 출력
     });
   };
-  const addFields = () => {
-    setInputFields([...inputFields, {
-      name: '',
-      price: 0
-    }]);
-    console.log(inputFields);
+
+  // ----------------------------------
+
+  const [testSubmit, setTestSubmit] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
+  const handleSelectChange = (e, groupId, groupInputType) => {
+    if (groupInputType === 'SELECT') {
+      const selectedOptions = Array.from(e.target.selectedOptions).map(option => ({
+        mainCategoryId: categoryLevel1.id,
+        subCategoryId: groupId,
+        subSubCategoryId: option.value
+      }));
+
+      // 기존 선택된 옵션에 추가
+      setTestSubmit(prev => [...prev.filter(item => !(item.mainCategoryId === categoryLevel1.id && item.subCategoryId === groupId)), ...selectedOptions]);
+    } else {
+      const textValue = e.target.value;
+      const textOptions = {
+        mainCategoryId: categoryLevel1.id,
+        subCategoryId: groupId,
+        inputValue: textValue
+      };
+      setTestSubmit(prev => [...prev.filter(item => !(item.mainCategoryId === categoryLevel1.id && item.subCategoryId === groupId)), textOptions]);
+      // 텍스트는 중복 값 들어갈 일 없어서 가능
+      // 근데 여러개 선택하는 셀레트는 조심해야함
+
+      // 텍스트 입력 값 초기화
+      setTextInputValue('');
+    }
   };
-  const removeField = index => {
-    const newFields = inputFields.filter((_, i) => i !== index);
-    setInputFields(newFields);
+  // 텍스트 입력 필드에서 입력될 때마다 상태를 업데이트
+  const handleTextChange = e => {
+    setTextInputValue(e.target.value);
+  };
+  const [textInputValue, setTextInputValue] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
+
+  /*        // 선택된 값을 관리하는 함수
+          const handleSelectChange = (e, groupId, groupInputType) => {
+            if (groupInputType === 'SELECT'){
+              const selectedOptions = Array.from(e.target.selectedOptions).map(option => ({
+                     mainCategoryId : categoryLevel1.id,
+                     subCategoryId :  groupId,
+                     subSubCategoryId : option.value
+              }));
+                setTestSubmit(prev => ({
+                  ...prev,
+                selectedOptions// 그룹 ID를 키로 하여 선택된 값 저장
+              }));
+              }else {
+                    const textValue = e.target.value;
+                    const textOptions = {mainCategoryId : categoryLevel1.id,
+                                           subCategoryId :  groupId,
+                                          inputValue : textValue};
+                      setTestSubmit(prev => ({
+                      ...prev,
+                      textOptions
+                    }));
+              }
+          };
+  */
+
+  const submitOnClick2 = () => {
+    axios__WEBPACK_IMPORTED_MODULE_3__["default"].post('/home/testSumit2', testSubmit) // `/api/submit`는 서버의 엔드포인트
+    .then(response => {
+      console.log('Response:', response.data); // 성공 시 서버 응답 출력
+    }).catch(error => {
+      console.error('Error submitting data:', error); // 에러 발생 시 출력
+    });
   };
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
     children: ["\uB0B4\uBD80 \uD398\uC774\uC9C0 \uAD6C\uD604", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
@@ -40238,12 +40263,12 @@ function Admin() {
         placeholder: "\uC0C1\uD488\uBA85"
       })]
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
-      children: ["\uAE30\uBCF8\uAC00\uACA9 :", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("input", {
+      children: ["\uAC00\uACA9 :", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("input", {
         type: "number",
         name: "price",
         value: product.price,
         onChange: handleChange,
-        placeholder: "\uAE30\uBCF8\uAC00\uACA9"
+        placeholder: "\uAC00\uACA9"
       })]
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
       children: ["\uC124\uBA85 :", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("input", {
@@ -40253,177 +40278,50 @@ function Admin() {
         onChange: handleChange,
         placeholder: "\uC124\uBA85"
       })]
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("br", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
-      style: {
-        border: '1px solid #ccc',
-        padding: '10px',
-        borderRadius: '5px',
-        width: '600px'
-      },
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("label", {
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("input", {
-            type: "radio",
-            checked: priceType === true,
-            onChange: () => setPriceType(true) // 무료 선택 시 true
-          }), "\uBB34\uB8CC"]
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("label", {
-          style: {
-            marginLeft: '10px'
-          },
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("input", {
-            type: "radio",
-            checked: priceType === false,
-            onChange: () => setPriceType(false) // 유료 선택 시 false
-          }), "\uC720\uB8CC"]
-        })]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
-        style: {
-          marginTop: '10px'
-        },
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("input", {
-          type: "text",
-          placeholder: "\uC11C\uBE44\uC2A4 \uC774\uB984",
-          value: serviceName,
-          onChange: e => setServiceName(e.target.value),
-          style: {
-            width: '200px',
-            marginRight: '10px',
-            color: 'blue'
-          }
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("input", {
-          type: "number",
-          value: serviceDetail,
-          onChange: e => setServiceDetail(e.target.value),
-          placeholder: "\uAC00\uACA9",
-          style: {
-            display: 'block',
-            marginTop: '5px'
-          },
-          disabled: fieldType.select1 === true || priceType == true
-        })]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
-        style: {
-          marginTop: '10px'
-        },
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("label", {
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("input", {
-            type: "checkbox",
-            value: "select1",
-            checked: fieldType === 'select1',
-            onChange: () => handleCheckboxChange('select1')
-          }), "\uC120\uD0DD (1)"]
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("label", {
-          style: {
-            marginLeft: '10px'
-          },
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("input", {
-            type: "checkbox",
-            value: "selectN",
-            checked: fieldType === 'selectN',
-            onChange: () => handleCheckboxChange('selectN')
-          }), "\uC120\uD0DD (n)"]
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("label", {
-          style: {
-            marginLeft: '10px'
-          },
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("input", {
-            type: "checkbox",
-            value: "text",
-            checked: fieldType === 'text',
-            onChange: () => handleCheckboxChange('text')
-          }), "\uD14D\uC2A4\uD2B8"]
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("label", {
-          style: {
-            marginLeft: '10px'
-          },
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("input", {
-            type: "checkbox",
-            value: "number",
-            checked: fieldType === 'number',
-            onChange: () => handleCheckboxChange('number')
-          }), "\uC22B\uC790"]
-        })]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
-        style: {
-          marginTop: '10px'
-        },
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("label", {
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("input", {
-            type: "radio",
-            value: "required",
-            checked: isRequired === true,
-            onChange: () => setIsRequired(true)
-          }), "\uD544\uC218"]
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("label", {
-          style: {
-            marginLeft: '10px'
-          },
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("input", {
-            type: "radio",
-            value: "notRequired",
-            checked: isRequired === false,
-            onChange: () => setIsRequired(false)
-          }), "\uD544\uC218\uC544\uB2D8"]
-        })]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
-        style: {
-          marginTop: '10px'
-        },
-        children: fieldType.select1 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
-          children: [inputFields.map((field, index) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("input", {
-              type: "text",
-              placeholder: "\uC22B\uC790 \uC785\uB825",
-              style: {
-                display: 'block',
-                marginTop: '5px'
-              },
-              value: field.name,
-              onChange: e => {
-                const newFields = [...inputFields];
-                newFields[index].name = e.target.value;
-                setInputFields(newFields);
-              }
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("input", {
-              type: "number",
-              placeholder: "\uAC00\uACA9",
-              value: field.price,
-              style: {
-                display: 'block',
-                marginTop: '5px'
-              },
-              onChange: e => {
-                const newFields = [...inputFields];
-                newFields[index].price = e.target.value;
-                setInputFields(newFields);
-              },
-              disabled: priceType === 'free'
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("button", {
-              type: "button",
-              onClick: () => removeField(index),
-              children: "-"
-            })]
-          }, index)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("button", {
-            type: "button",
-            onClick: addFields,
-            children: "+"
-          })]
-        })
-      })]
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("input", {
       type: "button",
       value: "\uB4F1\uB85D\uC644\uB8CC",
       onClick: submitOnClick
-    })]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("br", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("ul", {
+      children: Object.values(groupedCategories).map((group, index) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("li", {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("h3", {
+          children: [" ", group.name, "| ", group.isRequired ? "*필수" : "", "| ", group.isPaid ? "유료옵션" : "무료옵션", "| ", group.price === 0 ? "" : group.price + "원"]
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("p", {
+          style: {
+            display: 'none'
+          },
+          children: ["   ", group.inputType, "  "]
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("ul", {
+          children: group.inputType === "SELECT" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("select", {
+            multiple: true,
+            onChange: e => handleSelectChange(e, group.id, group.inputType),
+            children: group.subItems.map((subItem, subIndex) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("option", {
+              value: subItem.subId,
+              children: [subItem.subName, " + ", subItem.subPrice]
+            }, subIndex))
+          }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("input", {
+            type: "text",
+            onChange: e => handleSelectChange(e, group.id, group.inputType),
+            placeholder: "Enter text"
+          })
+        })]
+      }, group.id))
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("button", {
+      onClick: () => console.log(testSubmit),
+      children: "Submit"
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("button", {
+      onClick: submitOnClick2,
+      value: "\uB4F1\uB85D\uD560\uAC70\uC57C",
+      children: " \uB4F1\uB85D\uD560\uAC70\uC57C "
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("br", {})]
   });
 }
 
 //페이지 root가 되는 JS는 root에 삽입되도록 처리
 const root = react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot(document.getElementById('root'));
-root.render(/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(Admin, {}));
+root.render(/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(Main, {}));
 })();
 
 /******/ })()
 ;
-//# sourceMappingURL=admin.bundle.js.map
+//# sourceMappingURL=main.bundle.js.map

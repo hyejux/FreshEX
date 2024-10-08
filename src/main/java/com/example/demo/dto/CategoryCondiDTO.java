@@ -10,11 +10,13 @@ import lombok.*;
 @Builder
 public class CategoryCondiDTO {
 
+  private String category;
   private int id;
   private String name;
   private int parentId;
   private int level;
   private int price;
+  private String content;
 
   private int condiId;
   private int categoryId;
