@@ -69,5 +69,10 @@ public class MainServiceImpl implements MainService {
    return mainMapper.getDateTime(date);
   }
 
+  @Override
+  public List<ReservationListDTO> getReservationList() {
+    return mainMapper.getReservationList();
+  }
+
 
 }

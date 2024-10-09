@@ -16,4 +16,5 @@ public interface MainService {
   public void insertSecondCategory(CategoryCondiDTO dto);
   public void insertLastCategory(CategoryCondiDTO dto);
   public List<reservationslotsDTO> getDateTime(LocalDate date);
+  List<ReservationListDTO> getReservationList();
 }

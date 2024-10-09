@@ -18,7 +18,7 @@ public class HomeController {
 
   @GetMapping("/getItem")
   public TestDTO getItem() {
-    System.out.println(mainservice.PickSelect());
+//    System.out.println(mainservice.PickSelect());
     return mainservice.PickSelect();
   }
 
@@ -39,16 +39,22 @@ public class HomeController {
 
   @PostMapping("testSumit2")
   public void testSumit2(@RequestBody List<FormDTO> dto){
-    System.out.println(dto);
+//    System.out.println(dto);
     mainservice.testSumit2(dto);
   }
 
   @PostMapping("getDateTime")
   public List<reservationslotsDTO> getDateTime(@RequestBody reservationslotsDTO dto){
     LocalDate date = dto.getDate();
-    System.out.println(date);
+//    System.out.println(date);
     return mainservice.getDateTime(date);
   }
+
+ @GetMapping("getReservationList")
+ public List<ReservationListDTO> getReservationList(){
+   System.out.println(mainservice.getReservationList());
+    return mainservice.getReservationList();
+ }
 
   @PostMapping("testSumit3")
   public void testSumit3(@RequestBody List<CategoryCondiDTO> dto){

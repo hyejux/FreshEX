@@ -20,5 +20,6 @@ public interface MainMapper {
   public void insertLastCategory(CategoryCondiDTO dto);
 
   public List<reservationslotsDTO> getDateTime(LocalDate date);
+  List<ReservationListDTO> getReservationList();
 
 }
